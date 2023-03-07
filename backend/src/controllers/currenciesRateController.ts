@@ -73,7 +73,7 @@ export const editCurrencyRate: RequestHandler<EditCurrencyRateParams, unknown, E
 
         const updatedCurrencyRate = await currencyRate.save();
 
-        res.status(201).json({ status: true, note: updatedCurrencyRate });
+        res.status(201).json({ status: true, currencyRate: updatedCurrencyRate });
     } catch (error) {
         next(error);
     }
