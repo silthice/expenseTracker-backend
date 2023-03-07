@@ -6,6 +6,7 @@ import createHttpError, { isHttpError } from "http-errors";
 import morgan from "morgan";
 import userRoutes from "./routes/userRoutes";
 import currencyRateRoutes from "./routes/currencyRateRoutes";
+import categoriesRoutes from "./routes/categoryRoutes";
 import env from "./utils/validateEnv";
 
 const app = express();
@@ -35,6 +36,8 @@ app.use(
 app.use("/api/users", userRoutes);
 //Currency Rates
 app.use("/api/currencyRates", currencyRateRoutes);
+//Categories
+app.use("/api/categories", categoriesRoutes);
 
 //Error handling forwarder
 app.use((req, res, next) => {

@@ -7,4 +7,5 @@ const router = express.Router();
 router.post("/create", CurrencyRateController.createCurrencyRate);
 //Edit Currency Rate
 router.put("/edit/:cr_id", CurrencyRateController.editCurrencyRate);
+
 export default router;
