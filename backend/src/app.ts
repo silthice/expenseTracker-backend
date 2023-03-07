@@ -4,6 +4,8 @@ import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
 import createHttpError, { isHttpError } from "http-errors";
 import morgan from "morgan";
+import userRoutes from "./routes/userRoutes";
+import currencyRateRoutes from "./routes/currencyRateRoutes";
 import env from "./utils/validateEnv";
 
 const app = express();
@@ -29,6 +31,10 @@ app.use(
 );
 
 //Routing for API
+//Users
+app.use("/api/users", userRoutes);
+//Currency Rates
+app.use("/api/currencyRates", currencyRateRoutes);
 
 //Error handling forwarder
 app.use((req, res, next) => {
