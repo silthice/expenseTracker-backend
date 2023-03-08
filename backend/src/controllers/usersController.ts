@@ -4,6 +4,7 @@ import UserModel from "../models/user";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { assertIsDefined } from "../utils/assertIsDefined";
+import {signJWT, verifyJWT} from "../utils/jwt";
 
 interface SignUpBody {
     username?: string;
@@ -74,9 +75,13 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
             throw createHttpError(401, "Invalid credentials");
         }
 
-        req.session.userId = user._id;
+        // const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
 
-        res.status(201).json({ status: true, user: user });
+        const token = signJWT({userId: user._id}, {expiresIn: '1y'})
+
+        // req.session.userId = user._id;
+
+        res.status(201).json({ status: true, user: user, token: token });
     } catch (error) {
         next(error);
     }

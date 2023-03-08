@@ -9,6 +9,9 @@ router.post("/create", TransactionController.createTransaction);
 //Get Transaction List
 router.get("/getTransactionList", TransactionController.getTransactionList);
 
+//Get Transaction Detail
+router.get("/getTransactionDetail", TransactionController.getTransactionDetail);
+
 //Edit Transaction
 // router.put("/edit/:transaction_id", TransactionController.editTransaction);
 

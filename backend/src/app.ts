@@ -9,6 +9,7 @@ import currencyRateRoutes from "./routes/currencyRateRoutes";
 import categoriesRoutes from "./routes/categoryRoutes";
 import transactionsRoutes from "./routes/transactionsRoutes";
 import env from "./utils/validateEnv";
+import { authenticateToken, requiresAuth } from "./middlewares/auth";
 
 const app = express();
 
@@ -40,7 +41,7 @@ app.use("/api/currencyRates", currencyRateRoutes);
 //Categories
 app.use("/api/categories", categoriesRoutes);
 //Transactions
-app.use("/api/transactions", transactionsRoutes);
+app.use("/api/transactions", authenticateToken, transactionsRoutes);
 
 //Error handling forwarder
 app.use((req, res, next) => {
