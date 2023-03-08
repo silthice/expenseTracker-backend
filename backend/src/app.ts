@@ -7,6 +7,7 @@ import morgan from "morgan";
 import userRoutes from "./routes/userRoutes";
 import currencyRateRoutes from "./routes/currencyRateRoutes";
 import categoriesRoutes from "./routes/categoryRoutes";
+import transactionsRoutes from "./routes/transactionsRoutes";
 import env from "./utils/validateEnv";
 
 const app = express();
@@ -38,6 +39,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/currencyRates", currencyRateRoutes);
 //Categories
 app.use("/api/categories", categoriesRoutes);
+//Transactions
+app.use("/api/transactions", transactionsRoutes);
 
 //Error handling forwarder
 app.use((req, res, next) => {
