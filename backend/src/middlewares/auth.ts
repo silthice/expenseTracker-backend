@@ -6,9 +6,7 @@ import { verifyJWT } from "../utils/jwt";
 export const authenticateToken: RequestHandler = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    if (token == null) return res.sendStatus(401);
-
-    if (!token) {
+    if (token == null || !token) {
         return next(createHttpError(401, "Unauthorized access"));
     }
 
