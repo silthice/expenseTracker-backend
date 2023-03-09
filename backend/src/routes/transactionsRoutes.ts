@@ -12,7 +12,10 @@ router.get("/getTransactionList", TransactionController.getTransactionList);
 //Get Transaction Detail
 router.get("/getTransactionDetail", TransactionController.getTransactionDetail);
 
-//Edit Transaction
-// router.put("/edit/:transaction_id", TransactionController.editTransaction);
+// Edit Transaction
+router.put("/edit", TransactionController.editTransaction);
+
+//Delete Transaction
+router.delete("/delete", TransactionController.deleteTransaction);
 
 export default router;
