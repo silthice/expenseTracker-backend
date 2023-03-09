@@ -9,7 +9,7 @@ import currencyRateRoutes from "./routes/currencyRateRoutes";
 import categoriesRoutes from "./routes/categoryRoutes";
 import transactionsRoutes from "./routes/transactionsRoutes";
 import env from "./utils/validateEnv";
-import { authenticateToken, requiresAuth } from "./middlewares/auth";
+import { authenticateToken } from "./middlewares/auth";
 
 const app = express();
 
@@ -51,7 +51,6 @@ app.use((req, res, next) => {
 //Error handling
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-    console.error(error);
     let errorMsg = "Error occured";
     let statusCode = 500;
 
@@ -59,7 +58,7 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
         statusCode = error.statusCode;
         errorMsg = error.message;
     }
-    res.status(statusCode).json({ error: errorMsg });
+    res.status(statusCode).json({ status: false, errMsg: errorMsg });
 });
 
 //End of Middleware

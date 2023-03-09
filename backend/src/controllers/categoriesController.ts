@@ -12,12 +12,12 @@ export const createCategory: RequestHandler<unknown, unknown, CreateCategoryBody
 
     try {
         if (!cat_name) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missings"));
         }
 
         const existingCategory = await CategoryModel.findOne({ cat_name: cat_name }).exec();
         if (existingCategory) {
-            throw createHttpError(409, "Category: " + cat_name + " already exists");
+            return next(createHttpError(409, "Category: " + cat_name + " already exists"));
         }
 
         const counter = await CategoryModel.countDocuments();
@@ -46,19 +46,18 @@ export const editCategory: RequestHandler<EditCategoryParams, unknown, EditCateg
     const cat_name = req.body.cat_name;
 
     try {
-        console.log("ASDFASDFDSAFSADFSAFD", cat_uniq_id);
         if (!mongoose.isValidObjectId(cat_uniq_id)) {
-            throw createHttpError(400, "Invalid Category Id.");
+            return next(createHttpError(400, "Invalid Category Id"));
         }
 
         if (!cat_name) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         const category = await CategoryModel.findById(cat_uniq_id).exec();
 
         if (!category) {
-            throw createHttpError(404, "Category not found.");
+            return next(createHttpError(404, "Category not found."));
         }
 
         category.cat_name = cat_name;

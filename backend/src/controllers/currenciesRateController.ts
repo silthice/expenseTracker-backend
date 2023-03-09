@@ -16,12 +16,12 @@ export const createCurrencyRate: RequestHandler<unknown, unknown, CreateCurrency
 
     try {
         if (!cr_name || !cr_long_name || !cr_exchange_rate) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         const existingCurrencyRate = await CurrencyRateModel.findOne({ cr_name: cr_name }).exec();
         if (existingCurrencyRate) {
-            throw createHttpError(409, "Currency rate: " + cr_name + " already exists");
+            return next(createHttpError(409, "Currency rate: " + cr_name + " already exists"));
         }
 
         const newCurrencyRate = await CurrencyRateModel.create({
@@ -54,17 +54,17 @@ export const editCurrencyRate: RequestHandler<EditCurrencyRateParams, unknown, E
 
     try {
         if (!mongoose.isValidObjectId(cr_id)) {
-            throw createHttpError(400, "Invalid Currency Rate Id.");
+            return next(createHttpError(400, "Invalid Currency Rate Id."));
         }
 
         if (!cr_name || !cr_long_name || !cr_exchange_rate) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         const currencyRate = await CurrencyRateModel.findById(cr_id).exec();
 
         if (!currencyRate) {
-            throw createHttpError(404, "Currency Rate not found.");
+            return next(createHttpError(404, "Currency Rate not found."));
         }
 
         currencyRate.cr_name = cr_name.toUpperCase();

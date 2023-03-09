@@ -1,10 +1,10 @@
+import bcrypt from "bcrypt";
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
-import UserModel from "../models/user";
-import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import UserModel from "../models/user";
 import { assertIsDefined } from "../utils/assertIsDefined";
-import {signJWT, verifyJWT} from "../utils/jwt";
+import { signJWT } from "../utils/jwt";
 
 interface SignUpBody {
     username?: string;
@@ -21,17 +21,17 @@ export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
 
     try {
         if (!username || !email || !passwordRaw) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         const existingUsername = await UserModel.findOne({ username: username }).exec();
         if (existingUsername) {
-            throw createHttpError(409, "Username already exists");
+            return next(createHttpError(409, "Username already exists"));
         }
 
         const existingEmail = await UserModel.findOne({ email: email }).exec();
         if (existingEmail) {
-            throw createHttpError(409, "Email already exists");
+            return next(createHttpError(409, "Email already exists"));
         }
 
         const passwordHashed = await bcrypt.hash(passwordRaw, 10);
@@ -60,26 +60,22 @@ export const login: RequestHandler<unknown, unknown, LoginBody, unknown> = async
 
     try {
         if (!username || !password) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         //Try to retrieve user from db along with password and email field
         //password and email field are set to select false in userSchema
         const user = await UserModel.findOne({ username: username }).select("+password +email").exec();
         if (!user) {
-            throw createHttpError(401, "Invalid credentials");
+            return next(createHttpError(401, "Invalid credentials"));
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            throw createHttpError(401, "Invalid credentials");
+            return next(createHttpError(401, "Invalid credentials"));
         }
 
-        // const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
-
-        const token = signJWT({userId: user._id}, {expiresIn: '1y'})
-
-        // req.session.userId = user._id;
+        const token = signJWT({ userId: user._id }, { expiresIn: "1y" });
 
         res.status(201).json({ status: true, user: user, token: token });
     } catch (error) {
@@ -104,24 +100,22 @@ export const editUserProfile: RequestHandler<EditUserParams, unknown, EditUserPa
 
     try {
         if (!newPasswordRaw) {
-            throw createHttpError(400, "Parameters missing");
+            return next(createHttpError(400, "Parameters missing"));
         }
 
         assertIsDefined(authenticatedUserId);
         if (!mongoose.isValidObjectId(userId)) {
-            console.log("error here", userId);
-            console.log("error here", authenticatedUserId);
-            throw createHttpError(400, "Invalid User Id.");
+            return next(createHttpError(400, "Invalid User Id."));
         }
 
         const user = await UserModel.findById(userId).exec();
 
         if (!user) {
-            throw createHttpError(404, "User not found.");
+            return next(createHttpError(404, "User not found."));
         }
 
         if (!user._id.equals(authenticatedUserId)) {
-            throw createHttpError(401, "You cannot access this user");
+            return next(createHttpError(401, "You cannot access this user"));
         }
 
         const newPasswordHashed = await bcrypt.hash(newPasswordRaw, 10);
