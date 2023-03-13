@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
 import CategoryModel from "../models/category";
+import IncomeCategoryModel from "../models/incomeCategory";
 import CurrencyRateModel from "../models/currencyRate";
 import TransactionModel from "../models/transaction";
 import { assertIsDefined } from "../utils/assertIsDefined";
@@ -12,6 +13,7 @@ interface CreateTransactionBody {
     t_cat_id?: number;
     t_amt?: number;
     t_r_id?: string;
+    t_is_income?: boolean;
 }
 
 export const createTransaction: RequestHandler<unknown, unknown, CreateTransactionBody, unknown> = async (req, res, next) => {
@@ -20,11 +22,12 @@ export const createTransaction: RequestHandler<unknown, unknown, CreateTransacti
     const t_cat_id = req.body.t_cat_id;
     const t_amt = req.body.t_amt;
     const t_r_id = req.body.t_r_id;
+    const t_is_income = req.body.t_is_income;
 
     try {
         assertIsDefined(t_user_id);
 
-        if (!t_user_id || !t_cat_id || !t_amt || !t_r_id) {
+        if (!t_user_id || !t_cat_id || !t_amt || !t_r_id || t_is_income == null || t_is_income == undefined) {
             return next(createHttpError(400, "Parameters missing"));
         }
 
@@ -32,9 +35,23 @@ export const createTransaction: RequestHandler<unknown, unknown, CreateTransacti
             return next(createHttpError(401, "Unauthorized access"));
         }
 
-        const category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
-        if (!category) {
-            return next(createHttpError(404, "Category not found."));
+        // const category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
+        // if (!category) {
+        //     return next(createHttpError(404, "Category not found."));
+        // }
+
+        let category;
+
+        if (t_is_income) {
+            category = await IncomeCategoryModel.findOne({ cat_id: t_cat_id }).exec();
+            if (!category) {
+                return next(createHttpError(404, "Income Category not found."));
+            }
+        } else {
+            category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
+            if (!category) {
+                return next(createHttpError(404, "Category not found."));
+            }
         }
 
         const currencyRate = await CurrencyRateModel.findById(t_r_id).exec();
@@ -49,7 +66,8 @@ export const createTransaction: RequestHandler<unknown, unknown, CreateTransacti
             t_amt: t_amt,
             t_r_id: currencyRate?._id,
             t_r_name: currencyRate?.cr_name,
-            t_rate_during_transaction: currencyRate?.cr_exchange_rate
+            t_rate_during_transaction: currencyRate?.cr_exchange_rate,
+            t_is_income: t_is_income
         });
 
         res.status(201).json({ status: true, transaction: newTransaction });
@@ -61,14 +79,16 @@ export const createTransaction: RequestHandler<unknown, unknown, CreateTransacti
 interface GetTransactionBody {
     auth_user_id?: string;
     t_user_id?: string;
+    t_is_income?: boolean;
 }
 
 export const getTransactionList: RequestHandler<unknown, unknown, GetTransactionBody, unknown> = async (req, res, next) => {
     const auth_user_id = req.body.auth_user_id;
     const t_user_id = req.body.t_user_id;
+    const t_is_income = req.body.t_is_income;
 
     try {
-        if (!t_user_id) {
+        if (!t_user_id || t_is_income == null || t_is_income == undefined) {
             return next(createHttpError(400, "Parameters missing"));
         }
 
@@ -139,6 +159,7 @@ interface EditTransactionDetailBody {
     t_cat_id?: number;
     t_amt?: number;
     t_r_id?: string;
+    t_is_income?: boolean;
 }
 
 export const editTransaction: RequestHandler<unknown, unknown, EditTransactionDetailBody, unknown> = async (req, res, next) => {
@@ -148,9 +169,10 @@ export const editTransaction: RequestHandler<unknown, unknown, EditTransactionDe
     const t_cat_id = req.body.t_cat_id;
     const t_amt = req.body.t_amt;
     const t_r_id = req.body.t_r_id;
+    const t_is_income = req.body.t_is_income;
 
     try {
-        if (!t_user_id || !t_id || !t_cat_id || !t_amt || !t_r_id) {
+        if (!t_user_id || !t_id || !t_cat_id || !t_amt || !t_r_id || t_is_income == null || t_is_income == undefined) {
             return next(createHttpError(400, "Parameters missing"));
         }
 
@@ -178,9 +200,23 @@ export const editTransaction: RequestHandler<unknown, unknown, EditTransactionDe
             return next(createHttpError(401, "You cannot access this transaction"));
         }
 
-        const category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
-        if (!category) {
-            return next(createHttpError(404, "Category not found."));
+        // const category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
+        // if (!category) {
+        //     return next(createHttpError(404, "Category not found."));
+        // }
+
+        let category;
+
+        if (t_is_income) {
+            category = await IncomeCategoryModel.findOne({ cat_id: t_cat_id }).exec();
+            if (!category) {
+                return next(createHttpError(404, "Income Category not found."));
+            }
+        } else {
+            category = await CategoryModel.findOne({ cat_id: t_cat_id }).exec();
+            if (!category) {
+                return next(createHttpError(404, "Category not found."));
+            }
         }
 
         const currencyRate = await CurrencyRateModel.findById(t_r_id).exec();
@@ -194,6 +230,7 @@ export const editTransaction: RequestHandler<unknown, unknown, EditTransactionDe
         transaction.t_r_id = currencyRate._id;
         transaction.t_r_name = currencyRate.cr_name;
         transaction.t_rate_during_transaction = currencyRate.cr_exchange_rate;
+        transaction.t_is_income = t_is_income;
 
         const updatedTransaction = await transaction.save();
 

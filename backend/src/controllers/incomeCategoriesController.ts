@@ -1,14 +1,14 @@
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
-import CategoryModel from "../models/category";
+import IncomeCategoryModel from "../models/incomeCategory";
 import { assertIsDefined } from "../utils/assertIsDefined";
 
-interface CreateCategoryBody {
+interface CreateIncomeCategoryBody {
     cat_name?: string;
 }
 
-export const createCategory: RequestHandler<unknown, unknown, CreateCategoryBody, unknown> = async (req, res, next) => {
+export const createIncomeCategory: RequestHandler<unknown, unknown, CreateIncomeCategoryBody, unknown> = async (req, res, next) => {
     const cat_name = req.body.cat_name;
 
     try {
@@ -16,14 +16,14 @@ export const createCategory: RequestHandler<unknown, unknown, CreateCategoryBody
             return next(createHttpError(400, "Parameters missings"));
         }
 
-        const existingCategory = await CategoryModel.findOne({ cat_name: cat_name }).exec();
+        const existingCategory = await IncomeCategoryModel.findOne({ cat_name: cat_name }).exec();
         if (existingCategory) {
             return next(createHttpError(409, "Category: " + cat_name + " already exists"));
         }
 
-        const counter = await CategoryModel.countDocuments();
+        const counter = await IncomeCategoryModel.countDocuments();
 
-        const newCategory = await CategoryModel.create({
+        const newCategory = await IncomeCategoryModel.create({
             cat_name: cat_name,
             cat_id: counter + 1
         });
@@ -34,15 +34,15 @@ export const createCategory: RequestHandler<unknown, unknown, CreateCategoryBody
     }
 };
 
-interface EditCategoryParams {
+interface EditIncomeCategoryParams {
     cat_uniq_id?: string;
 }
 
-interface EditCategoryBody {
+interface EditIncomeCategoryBody {
     cat_name?: string;
 }
 
-export const editCategory: RequestHandler<EditCategoryParams, unknown, EditCategoryBody, unknown> = async (req, res, next) => {
+export const editIncomeCategory: RequestHandler<EditIncomeCategoryParams, unknown, EditIncomeCategoryBody, unknown> = async (req, res, next) => {
     const cat_uniq_id = req.params.cat_uniq_id;
     const cat_name = req.body.cat_name;
 
@@ -55,7 +55,7 @@ export const editCategory: RequestHandler<EditCategoryParams, unknown, EditCateg
             return next(createHttpError(400, "Parameters missing"));
         }
 
-        const category = await CategoryModel.findById(cat_uniq_id).exec();
+        const category = await IncomeCategoryModel.findById(cat_uniq_id).exec();
 
         if (!category) {
             return next(createHttpError(404, "Category not found."));
@@ -71,10 +71,9 @@ export const editCategory: RequestHandler<EditCategoryParams, unknown, EditCateg
     }
 };
 
-export const getCategoryList: RequestHandler<unknown, unknown, unknown, unknown> = async (req, res, next) => {
+export const getIncomeCategoryList: RequestHandler<unknown, unknown, unknown, unknown> = async (req, res, next) => {
     try {
-        const categories = await CategoryModel.find().exec();
-
+        const categories = await IncomeCategoryModel.find().exec();
         res.status(200).json({ status: true, category_list: categories });
     } catch (error) {
         next(error);

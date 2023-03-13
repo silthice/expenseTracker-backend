@@ -8,7 +8,8 @@ const transactionSchema = new Schema(
         t_amt: { type: Number, required: true },
         t_r_id: { type: Schema.Types.ObjectId, required: true },
         t_r_name: { type: String, required: true },
-        t_rate_during_transaction: { type: Number, required: true }
+        t_rate_during_transaction: { type: Number, required: true },
+        t_is_income: { type: Boolean, required: true }
     },
     { timestamps: true }
 );

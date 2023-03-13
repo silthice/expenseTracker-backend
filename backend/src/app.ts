@@ -7,6 +7,7 @@ import morgan from "morgan";
 import userRoutes from "./routes/userRoutes";
 import currencyRateRoutes from "./routes/currencyRateRoutes";
 import categoriesRoutes from "./routes/categoryRoutes";
+import incomeCategoriesRoutes from "./routes/incomeCategoryRoutes";
 import transactionsRoutes from "./routes/transactionsRoutes";
 import env from "./utils/validateEnv";
 import { authenticateToken } from "./middlewares/auth";
@@ -40,6 +41,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/currencyRates", currencyRateRoutes);
 //Categories
 app.use("/api/categories", categoriesRoutes);
+//Income Categories
+app.use("/api/incomeCategories", incomeCategoriesRoutes);
 //Transactions
 app.use("/api/transactions", authenticateToken, transactionsRoutes);
 
@@ -51,6 +54,7 @@ app.use((req, res, next) => {
 //Error handling
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
+    console.log(error);
     let errorMsg = "Error occured";
     let statusCode = 500;
 
