@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/create", TransactionController.createTransaction);
 
 //Get Transaction List
-router.get("/getTransactionList", TransactionController.getTransactionList);
+router.post("/getTransactionList", TransactionController.getTransactionList);
 
 //Get Transaction Detail
 router.get("/getTransactionDetail", TransactionController.getTransactionDetail);
