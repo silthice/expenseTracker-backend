@@ -15,11 +15,11 @@ interface SignUpBody {
 
 export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = async (req, res, next) => {
     const username = req.body.username;
-    const displayName = req.body.displayName;
     const email = req.body.email;
     const passwordRaw = req.body.password;
 
     try {
+        console.log(req.body)
         if (!username || !email || !passwordRaw) {
             return next(createHttpError(400, "Parameters missing"));
         }
@@ -38,7 +38,7 @@ export const signUp: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
 
         const newUser = await UserModel.create({
             username: username,
-            displayName: displayName,
+            // displayName: displayName,
             email: email,
             password: passwordHashed
         });
